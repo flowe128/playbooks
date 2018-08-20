@@ -1,0 +1,16 @@
+---
+- name: install VMtools
+  hosts: all
+  become: yes
+  tasks:
+        - name: Install Packages 
+          ignore_errors: yes
+          yum: pkg={{item}} enablerepo=vmware-tools state=installed
+          with_items:
+            - vmware-tools-services
+            - vmware-tools-esx-nox
+            - vmware-tools-pvscsi-common
+            - vmware-tools-plugins-autoUpgrade
+            - vmware-tools-plugins-guestInfo
+            - vmware-tools-plugins-powerOps
+            - vmware-tools-plugins-timeSync

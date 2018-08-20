@@ -1,0 +1,29 @@
+---
+- name: Filecopy 
+  hosts: all
+  become: yes
+  tasks: 
+    - name: mount SMB share
+      mount: 
+        fstype: cifs
+        #opts: "domain=sxc.com,username=test,password=test"
+        src: \\EGVC1VF9CIFS01\CBSDeployment\CHG0059911_v1_20180503\ 
+        name: /mnt
+        state: mounted
+
+    - name: Copy files
+      copy:
+        src: /mnt/
+        dest: /usr/local/test
+        owner: ansible
+        group: ansible
+        mode: 0666
+        remote_src: true
+
+    - name: umount SMB share
+      mount: 
+        fstype: cifs
+        #opts: "domain=sxc.com,username=test,password=test"
+        src: \\EGVC1VF9CIFS01\CBSDeployment\CHG0059911_v1_20180503\ 
+        name: /mnt
+        state: absent

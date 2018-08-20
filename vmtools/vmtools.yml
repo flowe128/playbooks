@@ -1,0 +1,36 @@
+---
+- name:  Install VMWare tools 
+  hosts: all
+  become: yes
+  tasks:
+        - name: Add yum repo file RHEL5
+          copy:
+            src: /usr/local/src/vmware-tools-rhel5.repo
+            dest: /etc/yum.repos.d/vmware-tools.repo
+            owner: root
+            group: root
+            mode: 0644
+          when: ansible_distribution_major_version == '5'
+        - name: Add yum repo file RHEL6
+          copy:
+            src: /usr/local/src/vmware-tools-rhel6.repo
+            dest: /etc/yum.repos.d/vmware-tools.repo
+            owner: root
+            group: root
+            mode: 0644
+          when: ansible_distribution_major_version == '6'
+
+        - name: Yum install of VMWare Tools for RHEL 6 
+          yum: pkg={{item}} enablerepo=vmware-tools state=present
+          with_items:
+            - vmware-tools-services
+            - vmware-tools-esx-nox
+            - vmware-tools-plugins-guestInfo
+            - vmware-tools-plugins-powerOps
+            - vmware-tools-plugins-timeSync
+          when: ansible_distribution_major_version == '6'
+
+        - name: Yum install VMtools for RHEL7
+          yum: name=open-vm-tools
+          when: ansible_distribution_major_version == '7'
+

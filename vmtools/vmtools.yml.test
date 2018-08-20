@@ -1,0 +1,5 @@
+---
+- name: install tools
+  yum:
+    name: hvmware-tools-services
+    state: present

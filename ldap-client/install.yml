@@ -1,0 +1,17 @@
+---
+- name: Install LDAP client
+  hosts: all
+  become: yes
+  tasks:
+  - name: Check IPA Install
+    command: ipa-client-install
+    register: iparesults
+    ignore_errors: yes 
+    failed_when: iparesults.rc > 3
+    changed_when: false
+
+  - name: Run LDAP install command
+    #command: ipa-client-install --force-join -N --mkhomedir --hostname=egvd1l1ihs23.sxc.com --domain=unix.sxc.com --server=egvc1l9ds01.sxc.com --realm=UNIX.SXC.COM  -p admin -U -w unixrules --debug
+    command: ipa-client-install --force-join -N --mkhomedir --hostname={{ ansible_hostname | lower }}.sxc.com --domain=unix.sxc.com --server=egvc1l9ds01.sxc.com --realm=UNIX.SXC.COM  -p admin -U -w unixrules --debug
+#    when: '"not configured" in iparesults.stderr'
+    when: iparesults.rc != 3

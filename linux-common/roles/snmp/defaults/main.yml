@@ -1,0 +1,11 @@
+---
+snmpd_communities:
+  - name: SXCPriv
+    type: ro
+    hosts:
+      - default
+snmpd_location: 'Server Room'
+snmpd_syscontact: 'Sysadmin (root@localhost)'
+snmp_service_name: snmpd
+
+# vim:ft=ansible:

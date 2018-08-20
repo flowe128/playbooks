@@ -1,0 +1,7 @@
+---
+- name: Test linux playbook
+  hosts: all
+
+  tasks:
+   - name: run uptime
+     command: uptime

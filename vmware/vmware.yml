@@ -1,0 +1,32 @@
+---
+- name: VMWare Create VM
+  hosts: localhost
+  tasks:
+    - name: Create VM
+      vmware_guest: 
+        datacenter: "{{ datacenter }}"
+        cluster: "{{ cluster }}"
+        folder: "{{ folder }}"
+        name: "{{ name }}"
+        template: "{{ template }}"
+        state: poweredon
+        wait_for_ip_address: true
+        validate_certs: false
+        networks:
+          - name: "{{ port_group }}"
+            type: static
+            ip: "{{ ip_address }}"
+            netmask: "{{ netmask }}"
+            gateway: "{{ gateway }}"
+            dns_servers: 
+             - "{{ VDNS1 }}"
+	     - "{{ VDNS2 }}"
+
+      register: newvm
+    - name: Wait for VM to startup
+      wait_for:
+        host: "{{ ip_address }}"
+        port: 22
+        delay: 30
+        connect_timeout: 5
+        timeout: 300

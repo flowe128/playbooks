@@ -1,0 +1,66 @@
+---
+- name: Register Servers with RH Satellite Server
+  hosts: all
+  become: yes
+  tasks:
+# Remove /etc/sysconfig/rhn/systemid on 
+     - name: Remove systemid on {{ ansible_hostname }}
+       file:
+         state: absent
+         path: /etc/sysconfig/rhn/systemid
+
+# Unregister via subscription manager
+     - name: Unregister via subscription manager on {{ ansible_hostname }}
+       shell: subscription-manager unregister
+
+# Clean via subscription manager
+     - name: Clean via subscription manager on {{ ansible_hostname }}
+       shell: subscription-manager clean
+
+# Install Katello
+     - name: Install Katello on {{ ansible_hostname }}
+       yum:
+         name: http://egvc1l9app32.sxc.com/pub/katello-ca-consumer-latest.noarch.rpm
+         state: present
+
+     - name: Red Hat subscription on RHEL5-32 {{ ansible_hostname }}
+       redhat_subscription:
+         state: present
+         activationkey: el5-32bit
+         org_id: catamaran
+         pool: '^Red Hat Enterprise Server$'
+       when: ansible_distribution_major_version == '5' and ansible_userspace_architecture == 'i686'
+
+     - name: Red Hat subscription on RHEL5 {{ ansible_hostname }}
+       redhat_subscription:
+         state: present
+         activationkey: el-5
+         org_id: catamaran
+         pool: '^Red Hat Enterprise Server$'
+       when: ansible_distribution_major_version == '5' and ansible_userspace_architecture == 'x86_64'
+
+     - name: Red Hat subscription on RHEL6 {{ ansible_hostname }}
+       shell: subscription-manager register --org="catamaran" --activationkey="el-6"
+       when: ansible_distribution_major_version == '6'
+
+     - name: Red Hat subscription on RHEL7 {{ ansible_hostname }}
+       shell: subscription-manager register --org="catamaran" --activationkey="el-7"
+       when: ansible_distribution_major_version == '7'
+
+
+# Enable tools repo RHEL6
+     - name: Register subscription manager RHEL6 {{ ansible_hostname }}
+       shell: subscription-manager repo --enable=rhel-6-server-satellite-tools-6.1-rpms
+       when: ansible_distribution_major_version == '6'
+
+# Enable tools repo RHEL7
+     - name: Register subscription manager RHEL7 {{ ansible_hostname }}
+       shell: subscription-manager repo --enable=rhel-7-server-satellite-tools-6.1-rpms
+       when: ansible_distribution_major_version == '7'
+
+# Install Katello-agent
+     - name: Install Katello-agent on {{ ansible_hostname }}
+       yum:
+         name: katello-agent
+         state: present
+

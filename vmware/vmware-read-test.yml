@@ -1,0 +1,14 @@
+---
+- name: VMWare Read-Only Test
+  hosts: all
+  gather_facts: no
+  tasks: 
+    - name: Retrieve VM Information
+      vmware_guest_facts:
+        datacenter: EGV Datacenter, IL
+#        uuid: 564d292a-7e28-c236-a23d-d2ddde001a00
+        name: EGVC1L9ABI01
+#        folder: /EGV Datacenter, IL/vm/Linux VMs
+        validate_certs: false
+      register: newvm
+      delegate_to: localhost

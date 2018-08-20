@@ -1,0 +1,13 @@
+---
+- name: Set File permissions
+  hosts: all
+  become: yes
+  tasks: 
+    - name: Set permissions on /var/lib/elasticsearch
+      file: 
+        path: /var/lib/elasticsearch
+        owner: ansible
+        group: ansible
+        mode: 0755
+        state: directory
+        recurse: yes

@@ -1,0 +1,29 @@
+---
+- name: file copy 2 (unix to unix)
+  hosts: all
+  become: yes
+  vars: 
+    csv_data: "{{ lookup('file','files.csv').splitlines() }}"
+  tasks:
+    - debug: 
+        var: csv_data
+    - name: Create directory
+      file: 
+        path: "{{ item.split(',')[4] }}"
+        owner: "{{ item.split(',')[1] }}"
+        group: "{{ item.split(',')[2] }}"
+        mode: "{{ item.split(',')[5] }}"
+        state: directory
+      with_items: 
+        - "{{ csv_data }}"
+
+    - name:  Copy file
+      copy: 
+        src: /usr/local/src/{{ item.split(',')[0] }}
+        dest: "{{ item.split(',')[4] }}/{{ item.split(',')[0] }}"
+        owner: "{{ item.split(',')[1] }}"
+        group: "{{ item.split(',')[2] }}"
+        mode: "{{ item.split(',')[5] }}"
+      with_items: 
+        - "{{ csv_data }}"
+

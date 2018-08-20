@@ -1,0 +1,6 @@
+---
+- name: Install/Configure SNMP
+  hosts: all
+  become: yes
+  roles: 
+    - snmp

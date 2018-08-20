@@ -1,0 +1,51 @@
+---
+- name: Install Symantec agent on Linux Systems
+  hosts: all
+  become: yes
+  tasks:
+     - name: Check if Symantec is installed on {{ ansible_hostname }}
+       stat: path=/opt/Symantec/symantec_antivirus/smcd
+       register: result
+
+     - name: Exit if Symantec is installed on {{ ansible_hostname }}
+       fail: msg="This host has symantec installed on {{ ansible_hostname }}"
+       when: result.stat.exists
+
+     - name: Extract Symantec software on {{ ansible_hostname }}
+       unarchive:
+         src: http://egvc1l9app32.sxc.com/pub/sep.tar.gz
+         dest: /tmp/
+         remote_src: yes
+
+     - name: Make sure glibc.i686 is installed on {{ ansible_hostname }}
+       yum:
+         name: glibc.i686
+         state: present
+
+     - name: Execute Symantec Installer on {{ ansible_hostname }}
+       shell: /tmp/sep/install.sh -i
+
+     - name: Enable smcd service on {{ ansible_hostname }} (RHEL 6)
+       service:
+         name: smcd
+         enabled: yes
+       when: ansible_distribution_major_version == '6' 
+
+     - name: Start start service on {{ ansible_hostname }} (RHEL 6)
+       service:
+         name: smcd
+         state: started
+       when: ansible_distribution_major_version == '6' 
+    
+     - name: Enable smcd service on {{ ansible_hostname }} (RHEL 7)
+       systemd:
+         name: smcd
+         enabled: yes
+         masked: no
+       when: ansible_distribution_major_version == '7' 
+
+     - name: Start smcd service on {{ ansible_hostname }} (RHEL 7)
+       systemd:
+         name: smcd
+         state: started
+       when: ansible_distribution_major_version == '7' 
